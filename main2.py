@@ -1,7 +1,6 @@
-import os
 import shutil
 import sys
-from os import mkdir
+from os import mkdir, listdir
 from os.path import exists as fileExists
 
 #   FUNCTIONS
@@ -43,6 +42,7 @@ def info_update(user):
     if len(contents) > 0:
         print("".join(contents))
         print("Monthly Salary: {}".format(fields["MONTHLY SALARY"]))
+
     file.close()
 
 def salary_bracketing(emp_salary):
@@ -65,7 +65,6 @@ def salary_bracketing(emp_salary):
 
 running = True
 while running:
-
     #   PROGRAM EXISTENCE CHECK:
     filename = "./company_data/.txt"
     if fileExists(filename):
@@ -105,7 +104,7 @@ while running:
     if cmd == 1:
         print("-" * 50)
         print("Available Company data: ")
-        dir_list = os.listdir(path='company_data/')
+        dir_list = listdir(path='company_data/')
         print(dir_list)
         print("-" * 50)
 
@@ -137,7 +136,7 @@ while running:
             print("-"*50)
             continue
 
-        dir_list = os.listdir(path='company_data/')
+        dir_list = listdir(path='company_data/')
         print(dir_list)
         print("-" * 50)
         employee_position = (input("Enter Position: "))
@@ -176,7 +175,7 @@ while running:
     elif cmd == 3:
         print("-"*50)
         print("Available employee data: ")
-        print(os.listdir(path='employees_data/'))
+        print(listdir(path='employees_data/'))
         print("-"*50)
 
         id_input = input("To read data, enter employee's I.D. Number: ")
@@ -193,7 +192,7 @@ while running:
     elif cmd == 4:
         print("-" * 50)
         print("Available Company data: ")
-        dir_list = os.listdir(path='company_data/')
+        dir_list = listdir(path='company_data/')
         print(dir_list)
         print("-" * 50)
 
