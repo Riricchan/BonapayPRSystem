@@ -5,6 +5,7 @@ from os.path import exists as fileExists
 
 COMPANY_DATA_FOLDER = "company_data/"
 EMPLOYEES_DATA_FOLDER = "employees_data/"
+running = True
 
 #   FUNCTIONS
 def company_file_location(filename):
@@ -22,6 +23,18 @@ def extract_data(contents):
         values = line.split(": ")
         fields[values[0]] = values[1]
     return fields
+
+def print_lines():
+    print("-" * 50)
+
+def print_dir_contents(folder):
+    dir_list = listdir(folder)
+    print(dir_list)
+    print_lines()
+
+def print_message(msg):
+    print(msg)
+    print_lines()
 
 def salary_read(user):
     filename = employee_file_location(user)
@@ -63,12 +76,12 @@ def salary_bracketing(emp_salary):
         company_fields = extract_data(contents)
         employee_position = fields["Deductions"]
 
-running = True
 while running:
     #   PROGRAM EXISTENCE CHECK:
     filename = "./{}/.txt".format(COMPANY_DATA_FOLDER)
     if fileExists(filename):
         continue
+    
     if not fileExists(COMPANY_DATA_FOLDER):
         prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
         if prompt_1 == "Y":
@@ -93,8 +106,7 @@ while running:
             sys.exit()
 
     #   MAIN MENU
-    print("Welcome to Bonapay Payroll Management System")
-    print("-"*50)
+    print_message("Welcome to Bonapay Payroll Management System")
     print("Select an action: \n"+"(1) Review company data \n"+"(2) Enroll employee \n"+
           "(3) Read employee data \n"+"(4) Delete employee data\n"+"(5) Reset program\n"+
           "(6) Exit")
@@ -102,17 +114,14 @@ while running:
     print("")
 
     if cmd == 1:
-        print("-" * 50)
+        print_lines()
         print("Available Company data: ")
-        dir_list = listdir(COMPANY_DATA_FOLDER)
-        print(dir_list)
-        print("-" * 50)
+        print_dir_contents(COMPANY_DATA_FOLDER)
 
         post_input = fix_text_format(input("To read data, enter position name: "))
         filename = company_file_location(post_input)
         if not fileExists(filename):
-            print("Data not found!")
-            print("-" * 50)
+            print_message("Data not found!")
             continue
 
         file = open(filename, "r")
@@ -132,15 +141,10 @@ while running:
 
         #   FILE EXISTENCE CHECK:
         if fileExists(filename):
-            print("Employee already exists!")
-            print("-"*50)
+            print_message("Employee already exists!")
             continue
-
-        dir_list = listdir(path=COMPANY_DATA_FOLDER)
-        print(dir_list)
-        print("-" * 50)
+        
         employee_position = (input("Enter Position: "))
-
         employee_absences = int(input("Number of Absences: "))
         employee_overtimeHrs = int(input("Number of Overtime Hours: "))
         employee_late = int(input("Number of Times Late (in mins.): "))
@@ -162,22 +166,19 @@ while running:
         file.write("EST. SALARY: {}\n".format(employee_salary))
         file.close()
 
-        print("-"*50)
-        print("Employee data saved successfully!")
-        print("-"*50)
+        print_lines()
+        print_message("Employee data saved successfully!")
 
     #   READ DATA:
     elif cmd == 3:
-        print("-"*50)
+        print_lines()
         print("Available employee data: ")
-        print(listdir(EMPLOYEES_DATA_FOLDER))
-        print("-"*50)
+        print_dir_contents(EMPLOYEES_DATA_FOLDER)
 
         id_input = input("To read data, enter employee's I.D. Number: ")
         filename = employee_file_location(id_input)
         if not fileExists(filename):
-            print("Employee data not found!")
-            print("-"*50)
+            print_message("Employee data not found!")
             continue
 
         # Calls function 'salary_read' and uses I.D. as parameter
@@ -185,17 +186,14 @@ while running:
 
     #   DELETE EMPLOYEE DATA
     elif cmd == 4:
-        print("-" * 50)
+        print_lines()
         print("Available Company data: ")
-        dir_list = listdir(path=COMPANY_DATA_FOLDER)
-        print(dir_list)
-        print("-" * 50)
+        print_dir_contents(COMPANY_DATA_FOLDER)
 
         post_input = fix_text_format(input("To read data, enter position name: "))
         filename = .format(post_input)
         if not fileExists(filename):
-            print("Data not found!")
-            print("-" * 50)
+            print_message("Data not found!")
             continue
 
         file = open(filename, "r")
@@ -211,11 +209,9 @@ while running:
         if cmd_1 == "Y":
             if fileExists("employees_data"):
                 shutil.rmtree("employees_data")
-            print("Employee data deleted succesfully!")
-            print("-" * 50)
+                print_message("Employee data deleted succesfully!")
             shutil.rmtree("company_data")
-            print("Company data deleted succesfully!")
-            print("-" * 50)
+            print_message("Company data deleted succesfully!")
 
     #   EXIT
     elif cmd == 6:
