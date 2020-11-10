@@ -1,5 +1,6 @@
 import shutil
 import sys
+from computation import *
 from os import mkdir, listdir
 from os.path import exists as fileExists
 
@@ -9,7 +10,7 @@ running = True
 
 #   FUNCTIONS
 def company_file_location(filename):
-    return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename)
+    return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename.replace(" ", "_").replace(".", "_"))
 
 def employee_file_location(filename):
     return "./{}{}.txt".format(EMPLOYEES_DATA_FOLDER, fix_text_format(filename))
@@ -20,7 +21,9 @@ def fix_text_format(user):
 def extract_data(contents):
     fields = {}
     for line in contents:
-        values = line.split(": ")
+        values = line.replace("\n", "").split(": ")
+        if len(values) != 2:
+            continue
         fields[values[0]] = values[1]
     return fields
 
@@ -40,16 +43,19 @@ def salary_read(user):
     filename = employee_file_location(user)
     file = open(filename, "r")
     contents = file.readlines()
-    fields = extract_data(contents)    
+    fields = extract_data(contents)
 
-    est_salary = fields["EST. SALARY"]
-    salary_bracketing(est_salary)
+    est_salary = int(fields["EST. SALARY"])
+    absences = int(fields["Num. of Absences"])
+    overtimeHrs = int(fields["Num. of Overtime Hours"])
+    late = int(fields["Num. of Times Late (in mins.)"])
+
+    #salary_bracketing(fields["Employee's Position"], est_salary)
 
     if len(contents) > 0:
         print("".join(contents))
-        print("Estimated Salary: {}".format(fields["EST. SALARY"]))
 
-        salary_bracketing(est_salary)
+    taxcalculator(est_salary,absences,overtimeHrs,late)
 
     file.close()
 
@@ -65,16 +71,18 @@ def info_update(user):
 
     file.close()
 
-def salary_bracketing(emp_salary):
-    global employee_position
+def salary_bracketing(emp_position, emp_salary):
     est_salary = emp_salary
+    position_filename = company_file_location(emp_position)
+    position_file = open(position_filename, "r+")
+    contents = position_file.readlines()
     fields = extract_data(contents)
     employee_position = fields["Company Position"]
 
-    if est_salary <=20000:
-        filename = company_file_location(employee_position.replace(" ", "_").replace(".", "_"))
-        company_fields = extract_data(contents)
-        employee_position = fields["Deductions"]
+    # if est_salary <=20000:
+    # filename = company_file_location(emp_position)
+    # company_fields = extract_data(contents)
+    # employee_position = fields["Deductions"]
 
 while running:
     #   PROGRAM EXISTENCE CHECK:
@@ -92,17 +100,16 @@ while running:
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
                 est_salary = int(input("Monthly salary: "))
-                filename = company_file_location(company_positions.replace(" ", "_").replace(".", "_"))
+                filename = company_file_location(company_positions)
                 file = open(filename, "w")
                 file.write("Company Position: {}\n".format(company_positions))
                 file.write("Salary: {}\n".format(est_salary))
 
-                if est_salary <= 20000:
-                    salary_deductions = {"SSS": 300, "PhilHealth": 500, "PAG-IBIG": 100}
-                    file.write("Deductions {}\n".format(salary_deductions))
-
             continue
         elif prompt_1 == "N":
+            sys.exit()
+        else:
+            print("Invalid Input!")
             sys.exit()
 
     #   MAIN MENU
@@ -143,7 +150,8 @@ while running:
         if fileExists(filename):
             print_message("Employee already exists!")
             continue
-        
+
+        print_dir_contents(COMPANY_DATA_FOLDER)
         employee_position = (input("Enter Position: "))
         employee_absences = int(input("Number of Absences: "))
         employee_overtimeHrs = int(input("Number of Overtime Hours: "))
@@ -158,8 +166,9 @@ while running:
         file.write("Num. of Overtime Hours: {}\n".format(employee_overtimeHrs))
         file.write("Num. of Times Late (in mins.): {}\n".format(employee_late))
 
-        filename = company_file_location(fix_text_format(employee_position))
-        contents = file.readlines()
+        position_filename = company_file_location(employee_position)
+        position_file = open(position_filename, "r+")
+        contents = position_file.readlines()
         fields = extract_data(contents)
         employee_salary = fields["Salary"]
 
