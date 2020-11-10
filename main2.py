@@ -81,7 +81,7 @@ while running:
     filename = "./{}/.txt".format(COMPANY_DATA_FOLDER)
     if fileExists(filename):
         continue
-    
+
     if not fileExists(COMPANY_DATA_FOLDER):
         prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
         if prompt_1 == "Y":
@@ -161,7 +161,7 @@ while running:
         filename = company_file_location(fix_text_format(employee_position))
         contents = file.readlines()
         fields = extract_data(contents)
-        employee_salary = fields["Salary: "]
+        employee_salary = fields["Salary"]
 
         file.write("EST. SALARY: {}\n".format(employee_salary))
         file.close()
@@ -191,7 +191,7 @@ while running:
         print_dir_contents(COMPANY_DATA_FOLDER)
 
         post_input = fix_text_format(input("To read data, enter position name: "))
-        filename = .format(post_input)
+        filename = company_file_location(post_input)
         if not fileExists(filename):
             print_message("Data not found!")
             continue
