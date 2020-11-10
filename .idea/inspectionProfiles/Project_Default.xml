@@ -6,6 +6,10 @@
         <list>
           <option value="list.replace" />
           <option value="int.close" />
+          <option value="list.split" />
+          <option value="set.__setitem__" />
+          <option value="set.__getitem__" />
+          <option value="os.shutil" />
         </list>
       </option>
     </inspection_tool>
