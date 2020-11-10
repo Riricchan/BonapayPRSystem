@@ -4,40 +4,40 @@ from os import mkdir, listdir
 from os.path import exists as fileExists
 
 #   FUNCTIONS
-def salary_read(user):
-    username = user
-    filename = "./employees_data/{}.txt".format(username.lower().replace(" ", "_").replace(".", "_"))
-    file = open(filename, "r")
-    contents = file.readlines()
-    fields = {}
+def fix_text_format(user):
+    return user.lower().replace(" ", "_").replace(".", "_")
 
+def extract_data(contents):
+    fields = {}
     for line in contents:
         values = line.split(": ")
         fields[values[0]] = values[1]
+    return fields
 
-        est_salary = fields["EST. SALARY"]
+def salary_read(user):
+    username = fix_text_format(user)
+    filename = "./employees_data/{}.txt".format(username)
+    file = open(filename, "r")
+    contents = file.readlines()
+    fields = extract_data(contents)    
+
+    est_salary = fields["EST. SALARY"]
+    salary_bracketing(est_salary)
+
+    if len(contents) > 0:
+        print("".join(contents))
+        print("Estimated Salary: {}".format(fields["EST. SALARY"]))
+
         salary_bracketing(est_salary)
-
-        if len(contents) > 0:
-            print("".join(contents))
-            print("Estimated Salary: {}".format(fields["EST. SALARY"]))
-
-        salary_bracketing(est_salary)
-
-
 
     file.close()
 
 def info_update(user):
-    username = user
-    filename = "./employees_data/{}.txt".format(username.lower().replace(" ", "_").replace(".", "_"))
+    username = fix_text_format(uesr)
+    filename = "./employees_data/{}.txt".format(username)
     file = open(filename, "r")
     contents = file.readlines()
-    fields = {}
-
-    for line in contents:
-        values = line.split(": ")
-        fields[values[0]] = values[1]
+    fields = extract_data(contents)
 
     if len(contents) > 0:
         print("".join(contents))
@@ -48,20 +48,13 @@ def info_update(user):
 def salary_bracketing(emp_salary):
     global employee_position
     est_salary = emp_salary
-
-    fields = {}
-    for line in contents:
-        values = line.split(": ")
-        fields[values[0]] = values[1]
-
-        employee_position = fields["Company Position"]
+    fields = extract_data(contents)
+    employee_position = fields["Company Position"]
 
     if est_salary <=20000:
         filename = "./company_data/{}.txt".format(str(employee_position).replace(" ", "_").replace(".", "_"))
-        for line in contents:
-            values = line.split(": ")
-            fields[values[0]] = values[1]
-            employee_position = fields["Deductions"]
+        company_fields = extract_data(contents)
+        employee_position = fields["Deductions"]
 
 running = True
 while running:
@@ -108,8 +101,8 @@ while running:
         print(dir_list)
         print("-" * 50)
 
-        post_input = input("To read data, enter position name: ")
-        filename = "./company_data/{}.txt".format(post_input.lower().replace(" ", "_").replace(".", "_"))
+        post_input = fix_text_format(input("To read data, enter position name: "))
+        filename = "./company_data/{}.txt".format(post_input)
         if not fileExists(filename):
             print("Data not found!")
             print("-" * 50)
@@ -154,14 +147,10 @@ while running:
         file.write("Num. of Overtime Hours: {}\n".format(employee_overtimeHrs))
         file.write("Num. of Times Late (in mins.): {}\n".format(employee_late))
 
-        filename = "./company_data/{}.txt".format(employee_position.lower().replace(" ", "_").replace(".", "_"))
+        filename = "./company_data/{}.txt".format(fix_text_format(employee_position))
 
         contents = file.readlines()
-        fields = {}
-        for line in contents:
-            values = line.split(": ")
-            fields[values[0]] = values[1]
-
+        fields = extract_data(contents)
         employee_salary = fields["Salary: "]
 
         file.write("EST. SALARY: {}\n".format(employee_salary))
@@ -179,7 +168,7 @@ while running:
         print("-"*50)
 
         id_input = input("To read data, enter employee's I.D. Number: ")
-        filename = "./employees_data/{}.txt".format(id_input.lower().replace(" ", "_").replace(".", "_"))
+        filename = "./employees_data/{}.txt".format(fix_text_format(id_input))
         if not fileExists(filename):
             print("Employee data not found!")
             print("-"*50)
@@ -196,8 +185,8 @@ while running:
         print(dir_list)
         print("-" * 50)
 
-        post_input = input("To read data, enter position name: ")
-        filename = "./company_data/{}.txt".format(post_input.lower().replace(" ", "_").replace(".", "_"))
+        post_input = fix_text_format(input("To read data, enter position name: "))
+        filename = "./company_data/{}.txt".format(post_input)
         if not fileExists(filename):
             print("Data not found!")
             print("-" * 50)
