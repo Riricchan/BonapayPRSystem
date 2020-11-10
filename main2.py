@@ -4,10 +4,14 @@ from os import mkdir, listdir
 from os.path import exists as fileExists
 
 COMPANY_DATA_FOLDER = "company_data/"
+EMPLOYEES_DATA_FOLDER = "employees_data/"
 
 #   FUNCTIONS
 def company_file_location(filename):
     return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename)
+
+def employee_file_location(filename):
+    return "./{}{}.txt".format(EMPLOYEES_DATA_FOLDER, fix_text_format(filename))
 
 def fix_text_format(user):
     return user.lower().replace(" ", "_").replace(".", "_")
@@ -20,8 +24,7 @@ def extract_data(contents):
     return fields
 
 def salary_read(user):
-    username = fix_text_format(user)
-    filename = "./employees_data/{}.txt".format(username)
+    filename = employee_file_location(user)
     file = open(filename, "r")
     contents = file.readlines()
     fields = extract_data(contents)    
@@ -38,8 +41,7 @@ def salary_read(user):
     file.close()
 
 def info_update(user):
-    username = fix_text_format(uesr)
-    filename = "./employees_data/{}.txt".format(username)
+    filename = employee_file_location(user)
     file = open(filename, "r")
     contents = file.readlines()
     fields = extract_data(contents)
@@ -121,12 +123,12 @@ while running:
 
     #   OPT #2 : WRITING DATA
     elif cmd == 2:
-        if not fileExists("employees_data/"):
-            mkdir("employees_data/")
+        if not fileExists(EMPLOYEES_DATA_FOLDER):
+            mkdir(EMPLOYEES_DATA_FOLDER)
         employee_fName = input("First Name: ")
         employee_lName = input("Last Name: ")
         employee_idNum = input("Employee I.D.: ")
-        filename = "./employees_data/{}.txt".format(employee_idNum.replace(" ", "_").replace(".", "_"))
+        filename = employee_file_location(employee_idNum)
 
         #   FILE EXISTENCE CHECK:
         if fileExists(filename):
@@ -168,11 +170,11 @@ while running:
     elif cmd == 3:
         print("-"*50)
         print("Available employee data: ")
-        print(listdir(path='employees_data/'))
+        print(listdir(EMPLOYEES_DATA_FOLDER))
         print("-"*50)
 
         id_input = input("To read data, enter employee's I.D. Number: ")
-        filename = "./employees_data/{}.txt".format(fix_text_format(id_input))
+        filename = employee_file_location(id_input)
         if not fileExists(filename):
             print("Employee data not found!")
             print("-"*50)
