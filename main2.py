@@ -3,7 +3,12 @@ import sys
 from os import mkdir, listdir
 from os.path import exists as fileExists
 
+COMPANY_DATA_FOLDER = "company_data/"
+
 #   FUNCTIONS
+def company_file_location(filename):
+    return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename)
+
 def fix_text_format(user):
     return user.lower().replace(" ", "_").replace(".", "_")
 
@@ -52,27 +57,27 @@ def salary_bracketing(emp_salary):
     employee_position = fields["Company Position"]
 
     if est_salary <=20000:
-        filename = "./company_data/{}.txt".format(str(employee_position).replace(" ", "_").replace(".", "_"))
+        filename = company_file_location(employee_position.replace(" ", "_").replace(".", "_"))
         company_fields = extract_data(contents)
         employee_position = fields["Deductions"]
 
 running = True
 while running:
     #   PROGRAM EXISTENCE CHECK:
-    filename = "./company_data/.txt"
+    filename = "./{}/.txt".format(COMPANY_DATA_FOLDER)
     if fileExists(filename):
         continue
-    if not fileExists("company_data/"):
+    if not fileExists(COMPANY_DATA_FOLDER):
         prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
         if prompt_1 == "Y":
-            mkdir("company_data/")
+            mkdir(COMPANY_DATA_FOLDER)
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
             positionNum = prompt_2
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
                 est_salary = int(input("Monthly salary: "))
-                filename = "./company_data/{}.txt".format(company_positions.replace(" ", "_").replace(".", "_"))
+                filename = company_file_location(company_positions.replace(" ", "_").replace(".", "_"))
                 file = open(filename, "w")
                 file.write("Company Position: {}\n".format(company_positions))
                 file.write("Salary: {}\n".format(est_salary))
@@ -97,12 +102,12 @@ while running:
     if cmd == 1:
         print("-" * 50)
         print("Available Company data: ")
-        dir_list = listdir(path='company_data/')
+        dir_list = listdir(COMPANY_DATA_FOLDER)
         print(dir_list)
         print("-" * 50)
 
         post_input = fix_text_format(input("To read data, enter position name: "))
-        filename = "./company_data/{}.txt".format(post_input)
+        filename = company_file_location(post_input)
         if not fileExists(filename):
             print("Data not found!")
             print("-" * 50)
@@ -129,7 +134,7 @@ while running:
             print("-"*50)
             continue
 
-        dir_list = listdir(path='company_data/')
+        dir_list = listdir(path=COMPANY_DATA_FOLDER)
         print(dir_list)
         print("-" * 50)
         employee_position = (input("Enter Position: "))
@@ -147,8 +152,7 @@ while running:
         file.write("Num. of Overtime Hours: {}\n".format(employee_overtimeHrs))
         file.write("Num. of Times Late (in mins.): {}\n".format(employee_late))
 
-        filename = "./company_data/{}.txt".format(fix_text_format(employee_position))
-
+        filename = company_file_location(fix_text_format(employee_position))
         contents = file.readlines()
         fields = extract_data(contents)
         employee_salary = fields["Salary: "]
@@ -181,12 +185,12 @@ while running:
     elif cmd == 4:
         print("-" * 50)
         print("Available Company data: ")
-        dir_list = listdir(path='company_data/')
+        dir_list = listdir(path=COMPANY_DATA_FOLDER)
         print(dir_list)
         print("-" * 50)
 
         post_input = fix_text_format(input("To read data, enter position name: "))
-        filename = "./company_data/{}.txt".format(post_input)
+        filename = .format(post_input)
         if not fileExists(filename):
             print("Data not found!")
             print("-" * 50)
