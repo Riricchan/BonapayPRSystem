@@ -4,8 +4,10 @@ from computation import *
 from os import mkdir, listdir
 from os.path import exists as fileExists
 
+#   DIRECTORIES
 COMPANY_DATA_FOLDER = "company_data/"
 EMPLOYEES_DATA_FOLDER = "employees_data/"
+
 running = True
 
 #   FUNCTIONS
@@ -49,13 +51,13 @@ def salary_read(user):
     absences = int(fields["Num. of Absences"])
     overtimeHrs = int(fields["Num. of Overtime Hours"])
     late = int(fields["Num. of Times Late (in mins.)"])
-
-    #salary_bracketing(fields["Employee's Position"], est_salary)
+    employee_status = fields["Civil Status"]
+    employee_dependents = int(fields["Number of dependents"])
 
     if len(contents) > 0:
         print("".join(contents))
 
-    taxcalculator(est_salary,absences,overtimeHrs,late)
+    taxcalculator(est_salary,absences,overtimeHrs,late,employee_status,employee_dependents)
 
     file.close()
 
@@ -93,13 +95,14 @@ while running:
     if not fileExists(COMPANY_DATA_FOLDER):
         prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
         if prompt_1 == "Y":
-            mkdir(COMPANY_DATA_FOLDER)
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
             positionNum = prompt_2
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
                 est_salary = int(input("Monthly salary: "))
+
+                mkdir(COMPANY_DATA_FOLDER)
                 filename = company_file_location(company_positions)
                 file = open(filename, "w")
                 file.write("Company Position: {}\n".format(company_positions))
@@ -152,10 +155,19 @@ while running:
             continue
 
         print_dir_contents(COMPANY_DATA_FOLDER)
-        employee_position = (input("Enter Position: "))
+        employee_position = input("Enter Position: ")
         employee_absences = int(input("Number of Absences: "))
         employee_overtimeHrs = int(input("Number of Overtime Hours: "))
         employee_late = int(input("Number of Times Late (in mins.): "))
+        employee_status = int(input("Civil Status (1) Single or (2) Married: "))
+        if employee_status == 2:
+            hus_Fname = input("First Name of Partner: ")
+            hus_Lname = input("Last Name of Partner: ")
+            occupation = input("Employed? (Y/N): ").upper()
+            if occupation == "Y":
+                hus_salary = int(input("Enter estimated salary: "))
+        employee_dependents = int(input("Enter number of dependents: "))
+
 
         #   DATA WRITING:
         file = open(filename, "w+")
@@ -165,13 +177,20 @@ while running:
         file.write("Num. of Absences: {}\n".format(employee_absences))
         file.write("Num. of Overtime Hours: {}\n".format(employee_overtimeHrs))
         file.write("Num. of Times Late (in mins.): {}\n".format(employee_late))
+        if employee_status == 2:
+            file.write("Civil Status: Married\n")
+            file.write("Name of Partner: {}\n".format(hus_Fname+" "+hus_Lname))
+            if occupation == "Y":
+                file.write("Employed: Yes\n")
+                file.write("Salary: {}\n".format(hus_salary))
+        file.write("Number of dependents: {}\n".format(employee_dependents))
 
         position_filename = company_file_location(employee_position)
         position_file = open(position_filename, "r+")
         contents = position_file.readlines()
         fields = extract_data(contents)
         employee_salary = fields["Salary"]
-
+        print_lines()
         file.write("EST. SALARY: {}\n".format(employee_salary))
         file.close()
 
@@ -192,6 +211,7 @@ while running:
 
         # Calls function 'salary_read' and uses I.D. as parameter
         salary_read(id_input)
+        print_lines()
 
     #   DELETE EMPLOYEE DATA
     elif cmd == 4:

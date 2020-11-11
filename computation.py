@@ -1,4 +1,4 @@
-def taxcalculator(estim_salary,emp_absent, ot_hours,late_num):
+def taxcalculator(estim_salary,emp_absent, ot_hours,late_num,civstat,dependents):
     #   BASE COMPUTATION. Variables in CAPS mean it's CONSTANT. DO NOT CHANGE!
     #   Modify HR_RATE variable. Refer to DAVAO'S MINIMUM WAGE RATE.
 
@@ -13,16 +13,29 @@ def taxcalculator(estim_salary,emp_absent, ot_hours,late_num):
     SSS_CONTRIB = 581.30
     ph_contrib =  275
     PAG_IBIG_fund = 100
-    tax_form = SSS_CONTRIB+PAG_IBIG_fund+ph_contrib
+    tax_deduc = 0
+    tax_form = SSS_CONTRIB+PAG_IBIG_fund+ph_contrib+tax_deduc
+
+    #   DEPENDENTS
+    civil_stat = civstat
+    emp_depend = dependents
 
 
-    #   HARDCODE the min/max salary. Base it on the salary bracketing table.
     est_salary = estim_salary
-    minSalary = 0
-    maxSalary = 20000
+    #   HARDCODE the min/max salary. Base it on the salary bracketing table.
 
+    if 0 <= est_salary <= 9999:
+        # I-CHANGE IF NEED
+        tax_deduc = 0.05
+        ph_contrib = 275
+        SSS_CONTRIB = 100
+        fin_salary = base_form-tax_form
 
-    #if minSalary <= est_salary <= maxSalary:
+    elif 10000 <= est_salary <= 29999:
+        # I-CHANGE IF NEED
+        tax_deduc = 0.05
+        ph_contrib = 275
+        SSS_CONTRIB = 100
+        fin_salary = base_form-tax_form
 
-    fin_salary = base_form-tax_form
-    print(fin_salary)
+    print("SALARY OF THE MONTH: {}".format(fin_salary))
