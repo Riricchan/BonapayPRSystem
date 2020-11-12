@@ -230,7 +230,7 @@ def employee_delete():
 def confirm_prompt(msg, action):
     try:
         cmd = int(input(msg+"\n"+
-                    "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
         if cmd == 1:
             action()
         elif cmd == 2:
@@ -252,8 +252,8 @@ def main_menu():
     #   MAIN MENU
     print_message("Welcome to Bonapay Payroll Management System")
     print("Select an action: \n"+"(1) Review company data \n"+"(2) Update company data \n"+"(3) Enroll employee \n"+
-            "(4) Read employee data \n"+"(5) Update employee data\n"+"(6) Delete employee data\n"+
-            "(7) Reset program\n"+"(8) Exit")
+          "(4) Read employee data \n"+"(5) Update employee data\n"+"(6) Delete employee data\n"+
+          "(7) Reset program\n"+"(8) Exit")
     cmd = int(input(">> "))
     print("")
     if cmd == 1:
