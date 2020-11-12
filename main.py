@@ -33,17 +33,13 @@ def salary_read(user):
     file = open(filename, "r")
     contents = file.readlines()
     fields = extract_data(contents)
-
     est_salary = int(fields["EST. SALARY"])
     absences = int(fields["Num. of Absences"])
     overtimeHrs = int(fields["Num. of Overtime Hours"])
     late = int(fields["Num. of Times Late (in mins.)"])
-
     if len(contents) > 0:
         print("".join(contents))
-
     taxcalculator(est_salary,absences,overtimeHrs,late)
-
     file.close()
 
 def info_update(user):
@@ -51,11 +47,9 @@ def info_update(user):
     file = open(filename, "r")
     contents = file.readlines()
     fields = extract_data(contents)
-
     if len(contents) > 0:
         print("".join(contents))
         print("Monthly Salary: {}".format(fields["MONTHLY SALARY"]))
-
     file.close()
 
 #   MENU FUNCTIONS
@@ -86,12 +80,10 @@ def company_write():
         elif prompt_1 == "N":
             sys.exit()
 
-
 def company_read():
     print_lines()
     print("Available Company data: ")
     print_dir_contents(COMPANY_DATA_FOLDER)
-
     post_input = fix_text_format(input("To read data, enter position name: "))
     filename = company_file_location(post_input)
     if not fileExists(filename):
@@ -105,6 +97,34 @@ def company_read():
     file.close()
     main_menu()
 
+def company_update():
+    print_lines()
+    print("Available Company data: ")
+    print_dir_contents(COMPANY_DATA_FOLDER)
+    post_input = fix_text_format(input("To edit data, enter position name: "))
+    filename = company_file_location(post_input)
+    if not fileExists(filename):
+        print_message("Data not found!")
+        main_menu()
+    pfile = open(filename, "r+")
+    contents = pfile.readlines()
+    fields = extract_data(contents)
+    if len(fields) == 0:
+        pfile.close()
+        print_message("Company data is empty!")
+        main_menu()
+    pfile.seek(0)
+    pfile.truncate()
+    print("Press enter to skip updating the specific field.")
+    for key, value in fields.items():
+        new_value = input("{} ({}): ".format(key, value))
+        if len(new_value) > 0:
+            fields[key] = new_value
+        pfile.write("{}: {}\n".format(key, fields[key]))
+    pfile.close()
+    print_lines()
+    print_message("Company data updated successfully!")
+    main_menu()
 
 def employee_write():
     if not fileExists(EMPLOYEES_DATA_FOLDER):
@@ -146,7 +166,6 @@ def employee_write():
     print_message("Employee data saved successfully!")
     main_menu()
 
-
 def employee_read():
     print_lines()
     print("Available employee data: ")
@@ -163,18 +182,15 @@ def employee_read():
     print_lines()
     main_menu()
 
-
 def employee_update():
     print_lines()
     print("Available employee data: ")
     print_dir_contents(EMPLOYEES_DATA_FOLDER)
-
     id_input = input("To update data, enter employee's I.D. Number: ")
     filename = employee_file_location(id_input)
     if not fileExists(filename):
         print_message("Employee data not found!")
         main_menu()
-
     employee_file = open(filename, "r+")
     contents = employee_file.readlines()
     fields = extract_data(contents)
@@ -182,7 +198,6 @@ def employee_update():
         employee_file.close()
         print_message("Employee data is empty!")
         main_menu()
-
     employee_file.seek(0)
     employee_file.truncate()
     print("Press enter to skip updating the specific field.")
@@ -190,13 +205,11 @@ def employee_update():
         new_value = input("{} ({}): ".format(key, value))
         if len(new_value) > 0:
             fields[key] = new_value
-        employee_file.write("{}: {}\n".format(key, value))
+        employee_file.write("{}: {}\n".format(key, fields[key]))
     employee_file.close()
-
     print_lines()
     print_message("Employee data updated successfully!")
     main_menu()
-
 
 def employee_delete():
     print_lines()
@@ -214,8 +227,10 @@ def employee_delete():
         print_lines()
     main_menu()
 
-def confirm_prompt(cmd, action):
+def confirm_prompt(msg, action):
     try:
+        cmd = int(input(msg+"\n"+
+                    "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
         if cmd == 1:
             action()
         elif cmd == 2:
@@ -236,36 +251,27 @@ def main_menu():
         company_write()
     #   MAIN MENU
     print_message("Welcome to Bonapay Payroll Management System")
-    print("Select an action: \n"+"(1) Review company data \n"+"(2) Enroll employee \n"+
-            "(3) Read employee data \n"+"(4) Update employee data\n"+"(5) Delete employee data\n"+
-            "(6) Reset program\n"+"(7) Exit")
+    print("Select an action: \n"+"(1) Review company data \n"+"(2) Update company data \n"+"(3) Enroll employee \n"+
+            "(4) Read employee data \n"+"(5) Update employee data\n"+"(6) Delete employee data\n"+
+            "(7) Reset program\n"+"(8) Exit")
     cmd = int(input(">> "))
     print("")
-
     if cmd == 1:
-        cmd = int(input("You are about to review your company's data.\n"+
-                    "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-        confirm_prompt(cmd, company_read)
+        confirm_prompt("You are about to review your company's data.", company_read)
     elif cmd == 2:
-        cmd = int(input("You are about to enroll your employee's data.\n"+
-                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-        confirm_prompt(cmd, employee_write)
-    #   READ DATA:
+        confirm_prompt("You are about to update your company's data.", company_update)
     elif cmd == 3:
-        cmd = int(input("You are about to read your employee's data.\n"+
-                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-        confirm_prompt(cmd, employee_read)
+        confirm_prompt("You are about to enroll your employee's data", employee_write)
+    #   READ DATA:
     elif cmd == 4:
-        cmd = int(input("You are about to update your employee's data.\n"+
-                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-        confirm_prompt(cmd, employee_update)
-    #   DELETE EMPLOYEE DATA
+        confirm_prompt("You are about to enroll your employee's data", employee_read)
     elif cmd == 5:
-        cmd = int(input("You are about to delete your employee's data.\n"+
-                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-        confirm_prompt(cmd, employee_delete)
-    #   PROGRAM RESET:
+        confirm_prompt("You are about to update your employee's data.", employee_update)
+    #   DELETE EMPLOYEE DATA
     elif cmd == 6:
+        confirm_prompt("You are about to delete your employee's data.", employee_delete)
+    #   PROGRAM RESET:
+    elif cmd == 7:
         print("This will delete all of the enrolled data. Proceed? (Y/N)")
         cmd_1 = input(">> ").upper()
         if cmd_1 == "Y":
@@ -278,7 +284,7 @@ def main_menu():
             error_message()
         main_menu()
     #   EXIT
-    elif cmd == 7:
+    elif cmd == 8:
         sys.exit()
     else:
         print_message("Invalid input! Try again.")
