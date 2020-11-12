@@ -1,24 +1,22 @@
 import os
 import shutil
 import sys
+import errno
 from computation import *
 from printfunc import *
-from os import mkdir
+from os import mkdir, rmdir
 from os.path import exists as fileExists
 
 #   DIRECTORIES
 COMPANY_DATA_FOLDER = "company_data/"
 EMPLOYEES_DATA_FOLDER = "employees_data/"
 
-
 #   FUNCTIONS   FOR     DIRECTORIES
 def company_file_location(filename):
     return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename.replace(" ", "_").replace(".", "_"))
 
-
 def employee_file_location(filename):
     return "./{}{}.txt".format(EMPLOYEES_DATA_FOLDER, fix_text_format(filename))
-
 
 #   DATA EXTRACTION
 def extract_data(contents):
@@ -29,7 +27,6 @@ def extract_data(contents):
             continue
         fields[values[0]] = values[1]
     return fields
-
 
 def salary_read(user):
     filename = employee_file_location(user)
@@ -49,7 +46,6 @@ def salary_read(user):
 
     file.close()
 
-
 def info_update(user):
     filename = employee_file_location(user)
     file = open(filename, "r")
@@ -62,27 +58,30 @@ def info_update(user):
 
     file.close()
 
-
 #   MENU FUNCTIONS
 def company_write():
+    if fileExists(COMPANY_DATA_FOLDER) and len(listdir(COMPANY_DATA_FOLDER)) == 0:
+        rmdir(COMPANY_DATA_FOLDER)
     if not fileExists(COMPANY_DATA_FOLDER):
         prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
         if prompt_1 == "Y":
+            try:
+                mkdir(COMPANY_DATA_FOLDER)
+            except OSError as osexc:
+                if osexc.errno != errno.EEXIST:
+                    return
+                pass
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
             positionNum = prompt_2
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
                 est_salary = int(input("Monthly salary: "))
-
-                if not fileExists(COMPANY_DATA_FOLDER):
-                    mkdir(COMPANY_DATA_FOLDER)
-                    continue
-
                 filename = company_file_location(company_positions)
-                file = open(filename, "w")
+                file = open(filename, "w+")
                 file.write("Company Position: {}\n".format(company_positions))
                 file.write("Salary: {}\n".format(est_salary))
+                file.close()
             print_lines()
         elif prompt_1 == "N":
             sys.exit()
@@ -166,7 +165,6 @@ def employee_read():
 
 
 def employee_update():
-    in_main_menu = False
     print_lines()
     print("Available employee data: ")
     print_dir_contents(EMPLOYEES_DATA_FOLDER)
@@ -175,7 +173,6 @@ def employee_update():
     filename = employee_file_location(id_input)
     if not fileExists(filename):
         print_message("Employee data not found!")
-        in_main_menu = True
         main_menu()
 
     employee_file = open(filename, "r+")
@@ -184,7 +181,6 @@ def employee_update():
     if len(contents) == 0 or len(fields) == 0:
         employee_file.close()
         print_message("Employee data is empty!")
-        in_main_menu = False
         main_menu()
 
     employee_file.seek(0)
@@ -218,128 +214,73 @@ def employee_delete():
         print_lines()
     main_menu()
 
+def confirm_prompt(cmd, action):
+    try:
+        if cmd == 1:
+            action()
+        elif cmd == 2:
+            main_menu()
+        else:
+            raise KeyError
+    except KeyError or ValueError:
+        error_message()
+        main_menu()
 
 def main_menu():
     try:
-        try:
-            company_write()
-        except KeyError and ValueError:
-            print("Invalid input! Please try again.")
-            if fileExists(COMPANY_DATA_FOLDER):
-                shutil.rmtree("company_data")
-            company_write()
+        company_write()
+    except KeyError or ValueError:
+        print("Invalid input! Please try again.")
+        if fileExists(COMPANY_DATA_FOLDER):
+            shutil.rmtree(COMPANY_DATA_FOLDER)
+        company_write()
+    #   MAIN MENU
+    print_message("Welcome to Bonapay Payroll Management System")
+    print("Select an action: \n"+"(1) Review company data \n"+"(2) Enroll employee \n"+
+            "(3) Read employee data \n"+"(4) Update employee data\n"+"(5) Delete employee data\n"+
+            "(6) Reset program\n"+"(7) Exit")
+    cmd = int(input(">> "))
+    print("")
 
-        #   MAIN MENU
-        print_message("Welcome to Bonapay Payroll Management System")
-        print("Select an action: \n"+"(1) Review company data \n"+"(2) Enroll employee \n"+
-              "(3) Read employee data \n"+"(4) Update employee data\n"+"(5) Delete employee data\n"+
-              "(6) Reset program\n"+"(7) Exit")
-        cmd = int(input(">> "))
-        print("")
-
-        if cmd == 1:
-            cmd = int(input("You are about to review your company's data.\n"+
+    if cmd == 1:
+        cmd = int(input("You are about to review your company's data.\n"+
+                    "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+        confirm_prompt(cmd, company_read)
+    elif cmd == 2:
+        cmd = int(input("You are about to enroll your employee's data.\n"+
                         "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-            if cmd == 1:
-                try:
-                    company_read()
-                except KeyError and ValueError:
-                    error_message()
-                    main_menu()
-            elif cmd == 2:
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-
-        elif cmd == 2:
-            cmd = int(input("You are about to enroll your employee's data.\n"+
-                            "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-            if cmd == 1:
-                try:
-                    employee_write()
-                except KeyError and ValueError:
-                    error_message()
-                    main_menu()
-            elif cmd == 2:
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-
-        #   READ DATA:
-        elif cmd == 3:
-            cmd = int(input("You are about to read your employee's data.\n"+
-                            "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-            if cmd == 1:
-                try:
-                    employee_read()
-                except KeyError and ValueError:
-                    error_message()
-                    main_menu()
-            elif cmd == 2:
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-
-        elif cmd == 4:
-            cmd = int(input("You are about to update your employee's data.\n"+
-                            "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-            if cmd == 1:
-                try:
-                    employee_update()
-                except KeyError and ValueError:
-                    error_message()
-                    main_menu()
-            elif cmd == 2:
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-
-        #   DELETE EMPLOYEE DATA
-        elif cmd == 5:
-            cmd = int(input("You are about to delete your employee's data.\n"+
-                            "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
-            if cmd == 1:
-                try:
-                    employee_delete()
-                except KeyError and ValueError:
-                    error_message()
-                    main_menu()
-            elif cmd == 2:
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-
-        #   PROGRAM RESET:
-        elif cmd == 6:
-            print("This will delete all of the enrolled data. Proceed? (Y/N)")
-            cmd_1 = input(">> ").upper()
-            if cmd_1 == "Y":
-                if fileExists("employees_data"):
-                    shutil.rmtree("employees_data")
-                    print_message("Employee data deleted succesfully!")
-                shutil.rmtree("company_data")
-                print_message("Company data deleted succesfully!")
-                main_menu()
-            else:
-                error_message()
-                main_menu()
-            print_lines()
-            main_menu()
-
-        #   EXIT
-        elif cmd == 7:
-            sys.exit()
-
+        confirm_prompt(cmd, employee_write)
+    #   READ DATA:
+    elif cmd == 3:
+        cmd = int(input("You are about to read your employee's data.\n"+
+                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+        confirm_prompt(cmd, employee_read)
+    elif cmd == 4:
+        cmd = int(input("You are about to update your employee's data.\n"+
+                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+        confirm_prompt(cmd, employee_update)
+    #   DELETE EMPLOYEE DATA
+    elif cmd == 5:
+        cmd = int(input("You are about to delete your employee's data.\n"+
+                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+        confirm_prompt(cmd, employee_delete)
+    #   PROGRAM RESET:
+    elif cmd == 6:
+        print("This will delete all of the enrolled data. Proceed? (Y/N)")
+        cmd_1 = input(">> ").upper()
+        if cmd_1 == "Y":
+            if fileExists(EMPLOYEES_DATA_FOLDER):
+                shutil.rmtree(EMPLOYEES_DATA_FOLDER)
+                print_message("Employee data deleted succesfully!")
+            shutil.rmtree(COMPANY_DATA_FOLDER)
+            print_message("Company data deleted succesfully!")
         else:
-            print_message("Invalid input! Try again.")
-            main_menu()
-    except KeyError and ValueError:
+            error_message()
+        main_menu()
+    #   EXIT
+    elif cmd == 7:
+        sys.exit()
+    else:
         print_message("Invalid input! Try again.")
         main_menu()
-
 main_menu()
