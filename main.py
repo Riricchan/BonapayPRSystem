@@ -3,19 +3,22 @@ import shutil
 import sys
 from computation import *
 from printfunc import *
-from os import mkdir, listdir
+from os import mkdir
 from os.path import exists as fileExists
 
 #   DIRECTORIES
 COMPANY_DATA_FOLDER = "company_data/"
 EMPLOYEES_DATA_FOLDER = "employees_data/"
 
+
 #   FUNCTIONS   FOR     DIRECTORIES
 def company_file_location(filename):
     return "./{}{}.txt".format(COMPANY_DATA_FOLDER, filename.replace(" ", "_").replace(".", "_"))
 
+
 def employee_file_location(filename):
     return "./{}{}.txt".format(EMPLOYEES_DATA_FOLDER, fix_text_format(filename))
+
 
 #   DATA EXTRACTION
 def extract_data(contents):
@@ -26,6 +29,7 @@ def extract_data(contents):
             continue
         fields[values[0]] = values[1]
     return fields
+
 
 def salary_read(user):
     filename = employee_file_location(user)
@@ -44,6 +48,7 @@ def salary_read(user):
     taxcalculator(est_salary,absences,overtimeHrs,late)
 
     file.close()
+
 
 def info_update(user):
     filename = employee_file_location(user)
@@ -66,10 +71,13 @@ def company_write():
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
             positionNum = prompt_2
-            mkdir(COMPANY_DATA_FOLDER)
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
                 est_salary = int(input("Monthly salary: "))
+
+                if not fileExists(COMPANY_DATA_FOLDER):
+                    mkdir(COMPANY_DATA_FOLDER)
+                    continue
 
                 filename = company_file_location(company_positions)
                 file = open(filename, "w")
@@ -78,6 +86,7 @@ def company_write():
             print_lines()
         elif prompt_1 == "N":
             sys.exit()
+
 
 def company_read():
     print_lines()
@@ -96,6 +105,7 @@ def company_read():
         print("".join(contents))
     file.close()
     main_menu()
+
 
 def employee_write():
     if not fileExists(EMPLOYEES_DATA_FOLDER):
@@ -137,6 +147,7 @@ def employee_write():
     print_message("Employee data saved successfully!")
     main_menu()
 
+
 def employee_read():
     print_lines()
     print("Available employee data: ")
@@ -152,6 +163,7 @@ def employee_read():
     salary_read(id_input)
     print_lines()
     main_menu()
+
 
 def employee_update():
     in_main_menu = False
@@ -189,6 +201,7 @@ def employee_update():
     print_message("Employee data updated successfully!")
     main_menu()
 
+
 def employee_delete():
     print_lines()
     print("Available employee data: ")
@@ -205,9 +218,17 @@ def employee_delete():
         print_lines()
     main_menu()
 
+
 def main_menu():
     try:
-        company_write()
+        try:
+            company_write()
+        except KeyError and ValueError:
+            print("Invalid input! Please try again.")
+            if fileExists(COMPANY_DATA_FOLDER):
+                shutil.rmtree("company_data")
+            company_write()
+
         #   MAIN MENU
         print_message("Welcome to Bonapay Payroll Management System")
         print("Select an action: \n"+"(1) Review company data \n"+"(2) Enroll employee \n"+
