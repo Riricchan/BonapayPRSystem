@@ -54,41 +54,41 @@ def info_update(user):
 
 #   MENU FUNCTIONS
 def company_write():
-    if fileExists(COMPANY_DATA_FOLDER) and len(listdir(COMPANY_DATA_FOLDER)) == 0:
-        rmdir(COMPANY_DATA_FOLDER)
-    if not fileExists(COMPANY_DATA_FOLDER):
-        prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
-        if prompt_1 == "Y":
-            try:
+    try:
+        if fileExists(COMPANY_DATA_FOLDER) and len(listdir(COMPANY_DATA_FOLDER)) == 0:
+            rmdir(COMPANY_DATA_FOLDER)
+        if not fileExists(COMPANY_DATA_FOLDER):
+            prompt_1 = input("Company data not found! Enroll your company? (Y/N): ").upper()
+            if prompt_1 == "Y":
                 mkdir(COMPANY_DATA_FOLDER)
-            except OSError as osexc:
-                if osexc.errno != errno.EEXIST:
-                    return
-                pass
-            company_name = input("Enter Company Name: ")
-            prompt_2 = int(input("Enter number of available positions: "))
-            if prompt_2 <= 0:
-                try:
-                    print_message("Invalid value! Try again.")
-                    company_write()
-                except KeyError and ValueError:
-                    print_message("Invalid value! Try again.")
-                    company_write()
-            positionNum = prompt_2
-            for i in range(positionNum):
-                company_positions = input("Enter position: ")
-                est_salary = int(input("Monthly salary: "))
-                filename = company_file_location(company_positions)
-                file = open(filename, "w+")
-                file.write("Company Position: {}\n".format(company_positions))
-                file.write("Salary: {}\n".format(est_salary))
-                file.close()
-            print_lines()
-        elif prompt_1 == "N":
-            sys.exit()
-        else:
-            print_message("Invalid input! Try again.")
-            company_write()
+                company_name = input("Enter Company Name: ")
+                position_num = int(input("Enter number of available positions: "))
+                if position_num < 1:
+                    raise ValueError
+                for i in range(position_num):
+                    company_positions = input("Enter position: ")
+                    est_salary = int(input("Monthly salary: "))
+                    filename = company_file_location(company_positions)
+                    file = open(filename, "w+")
+                    file.write("Company Position: {}\n".format(company_positions))
+                    file.write("Salary: {}\n".format(est_salary))
+                    file.close()
+                print_lines()
+            elif prompt_1 == "N":
+                sys.exit()
+            else:
+                raise ValueError
+    except KeyError and ValueError:
+        print("Invalid input! Please try again.")
+        if fileExists(COMPANY_DATA_FOLDER):
+            shutil.rmtree(COMPANY_DATA_FOLDER)
+        print_lines()
+        company_write()
+    except OSError as osexc:
+        if osexc.errno != errno.EEXIST:
+            return
+        print_lines()
+        company_write()
 
 def company_read():
     print_lines()
@@ -180,13 +180,11 @@ def employee_read():
     print_lines()
     print("Available employee data: ")
     print_dir_contents(EMPLOYEES_DATA_FOLDER)
-
     id_input = input("To read data, enter employee's I.D. Number: ")
     filename = employee_file_location(id_input)
     if not fileExists(filename):
         print_message("Employee data not found!")
         main_menu()
-
     # Calls function 'salary_read' and uses I.D. as parameter
     salary_read(id_input)
     print_lines()
@@ -239,28 +237,19 @@ def employee_delete():
 
 def confirm_prompt(msg, action):
     try:
-        cmd = int(input(msg+"\n"+
-                        "(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
+        cmd = int(input(msg+"\n"+"(1) Proceed\n"+"(2) Return to Main Menu\n"+">> "))
         if cmd == 1:
             action()
         elif cmd == 2:
             main_menu()
         else:
-            raise KeyError
-    except KeyError or ValueError:
+            raise ValueError
+    except KeyError and ValueError:
         error_message()
         main_menu()
 
 def main_menu():
-    try:
-        company_write()
-    except KeyError and ValueError:
-        print("Invalid input! Please try again.")
-        if fileExists(COMPANY_DATA_FOLDER):
-            shutil.rmtree(COMPANY_DATA_FOLDER)
-        print_lines()
-        company_write()
-
+    company_write()
     #   MAIN MENU
     print_message("Welcome to Bonapay Payroll Management System")
     print("Select an action: \n"+"(1) Review company data \n"+"(2) Update company data \n"+"(3) Enroll employee \n"+
