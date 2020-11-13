@@ -92,8 +92,6 @@ def company_write():
 
 def company_read():
     print_lines()
-    print("Available Company data: ")
-    print_dir_contents(COMPANY_DATA_FOLDER)
     post_input = fix_text_format(input("To read data, enter position name: "))
     filename = company_file_location(post_input)
     if not fileExists(filename):
@@ -265,7 +263,10 @@ def main_menu():
         confirm_prompt("You are about to enroll your employee's data", employee_write)
     #   READ DATA:
     elif cmd == 4:
-        confirm_prompt("You are about to enroll your employee's data", employee_read)
+        print("Available Company data: ")
+        print_dir_contents(EMPLOYEES_DATA_FOLDER)
+        confirm_prompt("NOTE: To read an employee's data, make sure to enroll an employee first."
+                       , employee_read)
     elif cmd == 5:
         confirm_prompt("You are about to update your employee's data.", employee_update)
     #   DELETE EMPLOYEE DATA
