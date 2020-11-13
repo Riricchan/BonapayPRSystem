@@ -65,14 +65,23 @@ def company_write():
                 position_num = int(input("Enter number of available positions: "))
                 if position_num < 1:
                     raise ValueError
-                for i in range(position_num):
-                    company_positions = input("Enter position: ")
-                    est_salary = int(input("Monthly salary: "))
-                    filename = company_file_location(company_positions)
+                company_position = ""
+                i = 0
+                while i < position_num:
+                    if len(company_position) == 0:
+                        company_position = input("Enter position: ")
+                    try:
+                        est_salary = int(input("Monthly salary: "))
+                        if est_salary < 1: raise ValueError
+                    except ValueError:
+                        continue
+                    filename = company_file_location(company_position)
                     file = open(filename, "w+")
-                    file.write("Company Position: {}\n".format(company_positions))
+                    file.write("Company Position: {}\n".format(company_position))
                     file.write("Salary: {}\n".format(est_salary))
                     file.close()
+                    i += 1
+                    company_position = ""
                 print_lines()
             elif prompt_1 == "N":
                 sys.exit()
@@ -152,7 +161,11 @@ def employee_write():
     employee_absences = int(input("Number of Absences: "))
     employee_overtimeHrs = int(input("Number of Overtime Hours: "))
     employee_late = int(input("Number of Times Late (in mins.): "))
-
+    position_filename = company_file_location(employee_position)
+    position_file = open(position_filename, "r+")
+    contents = position_file.readlines()
+    fields = extract_data(contents)
+    employee_salary = fields["Salary"]
     #   DATA WRITING:
     file = open(filename, "w+")
     file.write("Employee Name: {}\n".format(employee_fName+" "+employee_lName))
@@ -161,15 +174,8 @@ def employee_write():
     file.write("Num. of Absences: {}\n".format(employee_absences))
     file.write("Num. of Overtime Hours: {}\n".format(employee_overtimeHrs))
     file.write("Num. of Times Late (in mins.): {}\n".format(employee_late))
-
-    position_filename = company_file_location(employee_position)
-    position_file = open(position_filename, "r+")
-    contents = position_file.readlines()
-    fields = extract_data(contents)
-    employee_salary = fields["Salary"]
     file.write("EST. SALARY: {}\n".format(employee_salary))
     file.close()
-
     print_lines()
     print_message("Employee data saved successfully!")
     main_menu()
@@ -208,6 +214,16 @@ def employee_update():
     employee_file.truncate()
     print("Press enter to skip updating the specific field.")
     for key, value in fields.items():
+        if key == "Employee I.D.":
+            continue
+        elif key == "Employee's Position":
+            print_dir_contents(COMPANY_DATA_FOLDER)
+        elif key == "EST. SALARY":
+            position_filename = company_file_location(fields["Employee's Position"])
+            position_file = open(position_filename, "r+")
+            pfields = extract_data(position_file.readlines())
+            employee_file.write("{}: {}\n".format(key, pfields["Salary"]))
+            continue
         new_value = input("{} ({}): ".format(key, value))
         if len(new_value) > 0:
             fields[key] = new_value
@@ -265,8 +281,7 @@ def main_menu():
     elif cmd == 4:
         print("Available Company data: ")
         print_dir_contents(EMPLOYEES_DATA_FOLDER)
-        confirm_prompt("NOTE: To read an employee's data, make sure to enroll an employee first."
-                       , employee_read)
+        confirm_prompt("NOTE: To read an employee's data, make sure to enroll an employee first.", employee_read)
     elif cmd == 5:
         confirm_prompt("You are about to update your employee's data.", employee_update)
     #   DELETE EMPLOYEE DATA
