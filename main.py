@@ -182,8 +182,6 @@ def employee_write():
 
 def employee_read():
     print_lines()
-    print("Available employee data: ")
-    print_dir_contents(EMPLOYEES_DATA_FOLDER)
     id_input = input("To read data, enter employee's I.D. Number: ")
     filename = employee_file_location(id_input)
     if not fileExists(filename):

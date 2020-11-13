@@ -96,8 +96,7 @@ def taxcalculator(estim_salary,emp_absent, ot_hours,late_num):
 
         print("SALARY OF THE MONTH: {}PHP".format(round(fin_salary,2)))
 
-    elif est_salary > 500000:
-        # I-CHANGE IF NEED
+    elif est_salary >= 500000:
         tax_deduc = 0.32
         ph_contrib = 1800
         SSS_CONTRIB = 2400
