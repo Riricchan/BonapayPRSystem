@@ -67,9 +67,13 @@ def company_write():
                 pass
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
-            if prompt_2 == 0:
-                print_message("Invalid value! Try again.")
-                company_write()
+            if prompt_2 <= 0:
+                try:
+                    print_message("Invalid value! Try again.")
+                    company_write()
+                except KeyError and ValueError:
+                    print_message("Invalid value! Try again.")
+                    company_write()
             positionNum = prompt_2
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
