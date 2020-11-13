@@ -67,6 +67,9 @@ def company_write():
                 pass
             company_name = input("Enter Company Name: ")
             prompt_2 = int(input("Enter number of available positions: "))
+            if prompt_2 == 0:
+                print_message("Invalid value! Try again.")
+                company_write()
             positionNum = prompt_2
             for i in range(positionNum):
                 company_positions = input("Enter position: ")
@@ -79,6 +82,9 @@ def company_write():
             print_lines()
         elif prompt_1 == "N":
             sys.exit()
+        else:
+            print_message("Invalid input! Try again.")
+            company_write()
 
 def company_read():
     print_lines()
@@ -244,11 +250,13 @@ def confirm_prompt(msg, action):
 def main_menu():
     try:
         company_write()
-    except KeyError or ValueError:
+    except KeyError and ValueError:
         print("Invalid input! Please try again.")
         if fileExists(COMPANY_DATA_FOLDER):
             shutil.rmtree(COMPANY_DATA_FOLDER)
+        print_lines()
         company_write()
+
     #   MAIN MENU
     print_message("Welcome to Bonapay Payroll Management System")
     print("Select an action: \n"+"(1) Review company data \n"+"(2) Update company data \n"+"(3) Enroll employee \n"+
